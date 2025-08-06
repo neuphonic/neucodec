@@ -56,7 +56,6 @@ class SemanticEncoder(nn.Module):
     ):
         super(SemanticEncoder, self).__init__()
 
-        # 初始卷积，将 input_channels 映射到 encode_channels
         self.initial_conv = nn.Conv1d(
             in_channels=input_channels,
             out_channels=encode_channels,
@@ -66,7 +65,6 @@ class SemanticEncoder(nn.Module):
             bias=False,
         )
 
-        # 残差块
         self.residual_blocks = nn.Sequential(
             nn.ReLU(inplace=True),
             nn.Conv1d(
@@ -88,7 +86,6 @@ class SemanticEncoder(nn.Module):
             ),
         )
 
-        # 最终卷积，将 encode_channels 映射到 code_dim
         self.final_conv = nn.Conv1d(
             in_channels=encode_channels,
             out_channels=code_dim,
@@ -99,15 +96,6 @@ class SemanticEncoder(nn.Module):
         )
 
     def forward(self, x):
-        """
-        前向传播方法。
-
-        Args:
-            x (Tensor): 输入张量，形状为 (Batch, Input_channels, Length)
-
-        Returns:
-            Tensor: 编码后的张量，形状为 (Batch, Code_dim, Length)
-        """
         x = self.initial_conv(x)  # (Batch, Encode_channels, Length)
         x = self.residual_blocks(x) + x  # 残差连接
         x = self.final_conv(x)  # (Batch, Code_dim, Length)

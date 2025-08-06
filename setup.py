@@ -10,19 +10,15 @@ setup(
     author_email='harry@neuphonic.com',
     packages=find_packages(),
     install_requires=[
-        'librosa',
-        'soundfile',
         'numpy>=2.0.2',
-        'omegaconf>=2.3.0',
         'torch>=2.5.1',
         'torchaudio>=2.5.1',
-        'torchao>=0.5.0',
+        'torchao',
         'torchtune>=0.3.1',
-        'vector-quantize-pytorch>=1.17.8',
+        'vector-quantize-pytorch==1.17.8',
         'rotary-embedding-torch>=0.8.4',
         'transformers>=4.44.2',
-        'boto3>1.0',
-        'tqdm',
+        'local_attention'
     ],
     classifiers=[
         'Programming Language :: Python',
