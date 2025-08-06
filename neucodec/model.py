@@ -1,3 +1,5 @@
+from pathlib import Path
+from typing import Union, Dict, Type
 import soundfile as sf
 import os
 
@@ -5,6 +7,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchaudio
+from huggingface_hub import PyTorchModelHubMixin, hf_hub_download
 
 from typing import Optional
 from torchaudio import transforms as T
@@ -15,7 +18,12 @@ from .codec_decoder_vocos import CodecDecoderVocos
 from .module import SemanticEncoder
 
 
-class NeuCodec(nn.Module):
+class NeuCodec(
+    nn.Module,
+    PyTorchModelHubMixin,
+    repo_url="https://github.com/neuphonic/neucodec",
+    license="apache-2.0"
+):
     def __init__(self, ckpt_path: str, sample_rate: int, hop_length: int):
         super().__init__()
 
@@ -41,20 +49,53 @@ class NeuCodec(nn.Module):
         # load checkpoint
         self._load_ckpt(ckpt)
 
-    def _load_ckpt(self, ckpt):
-        # differentiate between `.ckpt` and `.bin`
-        if ckpt.get("state_dict"):
-            state_dicts = ckpt.get("state_dict")
-        else:
-            state_dicts = ckpt
+    @property
+    def device(self):
+        return next(self.parameters).device
 
+    @classmethod
+    def _from_pretrained(
+        cls,
+        *,
+        model_id: str,
+        revision: Optional[str] = None,
+        cache_dir: Optional[str] = None,
+        force_download: bool = False,
+        proxies: Optional[Dict] = None,
+        resume_download: bool = False,
+        local_files_only: bool = False,
+        token: Optional[str] = None,
+        map_location: str = "cpu",
+        strict: bool = True,
+        **model_kwargs,
+    ):
+        
+        # Download the model weights file
+        ckpt_path = hf_hub_download(
+            repo_id=model_id,
+            filename="pytorch_model.bin",
+            revision=revision,
+            cache_dir=cache_dir,
+            force_download=force_download,
+            proxies=proxies,
+            resume_download=resume_download,
+            local_files_only=local_files_only,
+            token=token,
+        )
+
+        # Initialize model
+        model = cls(ckpt_path, 24_000, 480)
+
+        return model
+        
+    def _load_ckpt(self, ckpt):
         # assign keys to correct model components
         filtered_enc = {}
         filtered_gen = {}
         filtered_post = {}
         filtered_prior = {}
         filtered_semantic = {}
-        for key, value in state_dicts.items():
+        for key, value in ckpt.items():
             if key.startswith("CodecEnc."):
                 new_key = key[len("CodecEnc."):]
                 filtered_enc[new_key] = value
@@ -263,7 +304,3 @@ class NeuCodec(nn.Module):
             curr_codes = F.pad(curr_codes, (0, padding), mode="constant", value=0)
             padded_codes.append(curr_codes)
         return torch.stack(padded_codes), token_durations
-
-    @property
-    def device(self):
-        return next(self.parameters()).device
