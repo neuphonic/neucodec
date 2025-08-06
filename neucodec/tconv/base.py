@@ -3,7 +3,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from ..layers import ChannelNorm, Conv1d, Linear, GRN, Snake1d
+from ..distill_layers import ChannelNorm, Conv1d, Linear, GRN, Snake1d
 
 
 def trend_pool(x, kernel_size):

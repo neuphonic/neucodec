@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from ..layers import ChannelNorm, Conv1d, Linear, GRN, Snake1d
+from ..distill_layers import ChannelNorm, Conv1d, Linear, GRN, Snake1d
 from . import base
 
 

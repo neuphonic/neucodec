@@ -1,13 +1,11 @@
-from typing import Dict, Union
+from typing import Optional, Dict
 from pathlib import Path
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from huggingface_hub import PyTorchModelHubMixin, hf_hub_download
-
-from typing import Optional
 import torchaudio
 from torchaudio import transforms as T
+from huggingface_hub import PyTorchModelHubMixin, hf_hub_download
 from transformers import AutoFeatureExtractor, HubertModel, Wav2Vec2BertModel
 
 from .codec_encoder import CodecEncoder
@@ -36,7 +34,7 @@ class NeuCodec(
 
     @property
     def device(self):
-        return next(self.parameters).device
+        return next(self.parameters()).device
 
     @classmethod
     def _from_pretrained(
@@ -54,7 +52,7 @@ class NeuCodec(
         strict: bool = True,
         **model_kwargs,
     ):
-        
+        assert model_id in ["neuphonic/neucodec", "neuphonic/distill-neucodec"]
         # download the model weights file
         ckpt_path = hf_hub_download(
             repo_id=model_id,
@@ -84,13 +82,15 @@ class NeuCodec(
     def _prepare_audio(self, audio_or_path: Path | torch.Tensor):
         
         # load from file
-        if isinstance(audio_or_path, Path):
+        if isinstance(audio_or_path, (Path, str)):
             y, sr = torchaudio.load(audio_or_path)
             if sr != 16_000:
-                y, sr = (T.Resample(sr, 16_000)(y), 16_000)[None, :]
+                y, sr = (T.Resample(sr, 16_000)(y), 16_000)
+                y = y[None, :] # [1, T] -> [B, 1, T]
 
         # ensure input tensor is of correct shape
         elif isinstance(audio_or_path, torch.Tensor):
+            y = audio_or_path
             if len(y.shape) == 3:
                 y = audio_or_path
             else:
@@ -113,7 +113,7 @@ class NeuCodec(
         vq_emb = vq_emb.transpose(1, 2)
 
         # semantic encoding
-        semantic_output = self.semantic_model(semantic_features).hidden_states[16].transpose(1, 2))
+        semantic_output = self.semantic_model(semantic_features).hidden_states[16].transpose(1, 2)
         semantic_encoded = self.SemanticEncoder_module(semantic_output)
 
         if vq_emb.shape[-1] != semantic_encoded.shape[-1]:
@@ -137,7 +137,7 @@ class NeuCodec(
 class DistillNeuCodec(NeuCodec):
     
     def __init__(self, sample_rate: int, hop_length: int):
-        super().__init__()
+        nn.Module.__init__(self)
         self.sample_rate = sample_rate
         self.hop_length = hop_length
         self.semantic_model = HubertModel.from_pretrained("ntu-spml/distilhubert", output_hidden_states=True)
@@ -162,14 +162,14 @@ class DistillNeuCodec(NeuCodec):
             F.pad(y[0,:].cpu(), (160, 160)), 
             sampling_rate=16_000, 
             return_tensors="pt"
-        ).input_features.to(self.device)
+        ).input_values.to(self.device).squeeze(0)
 
         # acoustic encoding
         vq_emb = self.fc_prior_sq(self.codec_encoder(y))
         vq_emb = vq_emb.transpose(1, 2)
 
         # semantic encoding
-        semantic_target = self.semantic_model(semantic_features).last_hidden_state.tranpose(1, 2)
+        semantic_target = self.semantic_model(semantic_features).last_hidden_state.transpose(1, 2)
         semantic_target = self.SemanticEncoder_module(semantic_target)
 
         if vq_emb.shape[-1] != semantic_target.shape[-1]:
