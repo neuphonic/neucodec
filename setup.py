@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 setup(
     name='neucodec',
     version='0.0.1',
-    description='A package for neucodec, based on xcodec2.',
+    description='A package for NeuCodec, based on xcodec2.',
     long_description_content_type='text/markdown',
     author='Harry Julian',
     author_email='harry@neuphonic.com',
@@ -13,7 +13,7 @@ setup(
         'numpy>=2.0.2',
         'torch>=2.5.1',
         'torchaudio>=2.5.1',
-        'torchao',
+        'torchao>=0.12.0',
         'torchtune>=0.3.1',
         'vector-quantize-pytorch==1.17.8',
         'rotary-embedding-torch>=0.8.4',

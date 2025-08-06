@@ -20,6 +20,7 @@ class NeuCodec(
     repo_url="https://github.com/neuphonic/neucodec",
     license="apache-2.0"
 ):
+
     def __init__(self, sample_rate: int, hop_length: int):
         super().__init__()
         self.sample_rate = sample_rate
@@ -79,7 +80,7 @@ class NeuCodec(
 
         return model
     
-    def _prepare_audio(self, audio_or_path: Path | torch.Tensor):
+    def _prepare_audio(self, audio_or_path: torch.Tensor | Path | str):
         
         # load from file
         if isinstance(audio_or_path, (Path, str)):
@@ -102,36 +103,53 @@ class NeuCodec(
         
         return y
         
-    def encode_code(self, audio_or_path: torch.Tensor) -> torch.Tensor:
+    def encode_code(self, audio_or_path: torch.Tensor | Path | str) -> torch.Tensor:
+        """
+        Args:
+            audio_or_path: torch.Tensor [B, 1, T] | Path | str, input audio
+
+        Returns:
+            fsq_codes: torch.Tensor [B, 1, F], 50hz fsq codes
+        """
 
         # prepare inputs
         y = self._prepare_audio(audio_or_path)
         semantic_features = self.feature_extractor(y, sampling_rate=16_000, return_tensors="pt").input_features.to(self.device)
 
         # acoustic encoding
-        vq_emb = self.CodecEnc(y.to(self.device))
-        vq_emb = vq_emb.transpose(1, 2)
+        acoustic_emb = self.CodecEnc(y.to(self.device))
+        acoustic_emb = acoustic_emb.transpose(1, 2)
 
         # semantic encoding
         semantic_output = self.semantic_model(semantic_features).hidden_states[16].transpose(1, 2)
         semantic_encoded = self.SemanticEncoder_module(semantic_output)
 
-        if vq_emb.shape[-1] != semantic_encoded.shape[-1]:
-            min_len = min(vq_emb.shape[-1], semantic_encoded.shape[-1])
-            vq_emb = vq_emb[:, :, :min_len]
-            semantic_encoded = semantic_encoded[:, :, :min_len]
-        
-        concat_emb = torch.cat([semantic_encoded, vq_emb], dim=1)
+        # concatenate embeddings
+        if acoustic_emb.shape[-1] != semantic_encoded.shape[-1]:
+            min_len = min(acoustic_emb.shape[-1], semantic_encoded.shape[-1])
+            acoustic_emb = acoustic_emb[:, :, :min_len]
+            semantic_encoded = semantic_encoded[:, :, :min_len]        
+        concat_emb = torch.cat([semantic_encoded, acoustic_emb], dim=1)
         concat_emb = self.fc_prior(concat_emb.transpose(1, 2)).transpose(1, 2)
-        _, vq_code, _ = self.generator(concat_emb, vq=True)
-        return vq_code
 
-    def decode_code(self, vq_code: torch.Tensor) -> torch.Tensor:
-        vq_post_emb = self.generator.quantizer.get_output_from_indices(vq_code.transpose(1, 2))
-        vq_post_emb = vq_post_emb.transpose(1, 2)
-        vq_post_emb = self.fc_post_a(vq_post_emb.transpose(1, 2)).transpose(1, 2) 
-        recon_audio = self.generator(vq_post_emb.transpose(1, 2), vq=False)[0]
-        return recon_audio
+        # quantize
+        _, fsq_codes, _ = self.generator(concat_emb, vq=True)
+        return fsq_codes
+
+    def decode_code(self, fsq_codes: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            fsq_codes: torch.Tensor [B, 1, F], 50hz fsq codes
+
+        Returns:
+            recon: torch.Tensor [B, 1, T], reconstructed 24kHz audio
+        """
+
+        fsq_post_emb = self.generator.quantizer.get_output_from_indices(fsq_codes.transpose(1, 2))
+        fsq_post_emb = fsq_post_emb.transpose(1, 2)
+        fsq_post_emb = self.fc_post_a(fsq_post_emb.transpose(1, 2)).transpose(1, 2) 
+        recon = self.generator(fsq_post_emb.transpose(1, 2), vq=False)[0]
+        return recon
     
 
 class DistillNeuCodec(NeuCodec):
@@ -154,7 +172,14 @@ class DistillNeuCodec(NeuCodec):
         self.fc_prior_sq = nn.Linear(512, 768)
         self.fc_post_a = nn.Linear(2048, 1024)
         
-    def encode_code(self, audio_or_path: torch.Tensor | Path) -> torch.Tensor:
+    def encode_code(self, audio_or_path: torch.Tensor | Path | str) -> torch.Tensor:
+        """
+        Args:
+            audio_or_path: torch.Tensor [B, 1, T] | Path | str, input audio
+
+        Returns:
+            fsq_codes: torch.Tensor [B, 1, F], 50hz fsq codes
+        """
 
         # prepare inputs
         y = self._prepare_audio(audio_or_path)
