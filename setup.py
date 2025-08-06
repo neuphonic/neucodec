@@ -18,7 +18,7 @@ setup(
         'vector-quantize-pytorch==1.17.8',
         'rotary-embedding-torch>=0.8.4',
         'transformers>=4.44.2',
-        'local_attention'
+        'local_attention>=1.11.1'
     ],
     classifiers=[
         'Programming Language :: Python',
