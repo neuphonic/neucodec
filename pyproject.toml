@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "neucodec"
 version = "0.0.1"
-description = "A python SDK for the Neuphonic Codec"
+description = "A package for neucodec, based on xcodec2."
 authors = ["Neuphonic <support@neuphonic.com>"]
 readme = "README.md"
 license = "MIT"
@@ -11,19 +11,16 @@ packages = [{ include = "neucodec" }]
 python = "^3.10"
 
 # Your provided runtime dependencies
-librosa = ">=0.10.1"
-soundfile = ">=0.12.1"
 numpy = ">=2.0.2"
-omegaconf = ">=2.3.0"
+
 torch = ">=2.5.1"
 torchaudio = ">=2.5.1"
-torchao = ">=0.5.0"
+torchao = "*"
 torchtune = ">=0.3.1"
-vector-quantize-pytorch = ">=1.17.8"
+vector-quantize-pytorch = "==1.17.8"
 rotary-embedding-torch = ">=0.8.4"
 transformers = ">=4.44.2"
-boto3 = ">1.0"
-tqdm = ">=4.67.0"
+local_attention = "*"
 
 # Optional: specify dev dependencies
 [tool.poetry.group.dev.dependencies]
