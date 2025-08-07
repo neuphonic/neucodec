@@ -82,7 +82,7 @@ class NeuCodec(
         model = cls(24_000, 480)
 
         # load weights
-        state_dict = torch.load(ckpt_path)
+        state_dict = torch.load(ckpt_path, map_location)
         contains_list = lambda s, l: any(i in s for i in l)
         state_dict = {
             k:v for k, v in state_dict.items() 
