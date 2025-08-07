@@ -1,3 +1,4 @@
+import os
 from typing import Optional, Dict
 from pathlib import Path
 import torch
@@ -57,11 +58,12 @@ class NeuCodec(
         strict: bool = True,
         **model_kwargs,
     ):
+        
         assert model_id in ["neuphonic/neucodec", "neuphonic/distill-neucodec"]
         if model_id == "neuphonic/neucodec": 
             ignore_keys = ["fc_post_s", "post_net", "SemanticDecoder"]
         elif model_id == "neuphonic/distill-neucodec":
-            ignore_keys = ["fc_post_s", "SemanticDecoder", "criteria"]
+            ignore_keys = []
 
         # download the model weights file
         ckpt_path = hf_hub_download(
@@ -86,7 +88,9 @@ class NeuCodec(
             k:v for k, v in state_dict.items() 
             if not contains_list(k, ignore_keys)
         }
-        model.load_state_dict(state_dict, strict=True)
+
+        # TODO: we can move to strict loading once we clean up the checkpoints
+        model.load_state_dict(state_dict, strict=False)
 
         return model
     
@@ -212,7 +216,7 @@ class DistillNeuCodec(NeuCodec):
         )
 
         # acoustic encoding
-        fsq_emb = self.fc_prior_sq(self.codec_encoder(y.to(self.device)))
+        fsq_emb = self.fc_sq_prior(self.codec_encoder(y.to(self.device)))
         fsq_emb = fsq_emb.transpose(1, 2)
 
         # semantic encoding
