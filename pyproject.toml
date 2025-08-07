@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "neucodec"
-version = "0.0.1"
-description = "A package for neucodec, based on xcodec2."
+version = "0.0.1.dev1"
+description = "A package for NeuCodec, based on xcodec2."
 authors = ["Neuphonic <support@neuphonic.com>"]
 readme = "README.md"
 license = "MIT"
