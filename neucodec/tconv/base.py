@@ -3,7 +3,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from ..distill_layers import ChannelNorm, Conv1d, Linear, GRN, Snake1d
+from ..distill_layers import Conv1d
 
 
 def trend_pool(x, kernel_size):
@@ -25,7 +25,13 @@ class TrendPool(nn.Module):
 
 
 class FirstBlock(nn.Module):
-    def __init__(self, target_dim, conv_kernels=(7, 7, 7, 7), pool_kernels=(1, 3, 5, 9), dilation_rate=2):
+    def __init__(
+        self,
+        target_dim,
+        conv_kernels=(7, 7, 7, 7),
+        pool_kernels=(1, 3, 5, 9),
+        dilation_rate=2,
+    ):
         super().__init__()
         assert target_dim % len(pool_kernels) == 0
         each_dim = target_dim // len(pool_kernels)
@@ -36,7 +42,13 @@ class FirstBlock(nn.Module):
             blocks.append(
                 nn.Sequential(
                     TrendPool(pool_kernel),
-                    Conv1d(1, each_dim, kernel_size=conv_kernel, dilation=conv_dilation, padding=conv_padding),
+                    Conv1d(
+                        1,
+                        each_dim,
+                        kernel_size=conv_kernel,
+                        dilation=conv_dilation,
+                        padding=conv_padding,
+                    ),
                 )
             )
         self.blocks = nn.ModuleList(blocks)
@@ -52,14 +64,14 @@ class EnhanceBlock(FirstBlock):
         self.merge_layer = nn.Sequential(
             # nn.LeakyReLU(),  # ! if active or use InstanceNorm1d
             nn.InstanceNorm1d(4, affine=True),
-            nn.Conv1d(4, 1, kernel_size=1)
+            nn.Conv1d(4, 1, kernel_size=1),
         )
 
     def forward(self, x):
-        x = einops.rearrange(x, 'b c t -> (b c) 1 t', c=self.dim)
+        x = einops.rearrange(x, "b c t -> (b c) 1 t", c=self.dim)
         y = super().forward(x)
         y = self.merge_layer(y)
-        y = einops.rearrange(y, '(b c) 1 t -> b c t', c=self.dim)
+        y = einops.rearrange(y, "(b c) 1 t -> b c t", c=self.dim)
         return y  # ! x + y or x + y * x
 
 
@@ -70,7 +82,7 @@ class SimpleEnhanceBlock(FirstBlock):
         self.merge_layer = nn.Sequential(
             # nn.LeakyReLU(),  # ! if active or use InstanceNorm1d
             nn.InstanceNorm1d(4, affine=True),
-            nn.Conv1d(4, self.dim, kernel_size=1)
+            nn.Conv1d(4, self.dim, kernel_size=1),
         )
 
     def forward(self, x):
