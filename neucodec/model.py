@@ -58,6 +58,11 @@ class NeuCodec(
         **model_kwargs,
     ):
         assert model_id in ["neuphonic/neucodec", "neuphonic/distill-neucodec"]
+        if model_id == "neuphonic/neucodec": 
+            ignore_keys = ["fc_post_s", "post_net", "SemanticDecoder"]
+        elif model_id == "neuphonic/distill-neucodec":
+            ignore_keys = ["fc_post_s", "SemanticDecoder", "criteria"]
+
         # download the model weights file
         ckpt_path = hf_hub_download(
             repo_id=model_id,
@@ -76,8 +81,12 @@ class NeuCodec(
 
         # load weights
         state_dict = torch.load(ckpt_path)
-        state_dict = {".".join(k.split(".")[1:]): v for k, v in state_dict.items()}
-        model.load_state_dict(state_dict, strict=False)
+        contains_list = lambda s, l: any(i in s for i in l)
+        state_dict = {
+            k:v for k, v in state_dict.items() 
+            if not contains_list(k, ignore_keys)
+        }
+        model.load_state_dict(state_dict, strict=True)
 
         return model
     
@@ -146,7 +155,7 @@ class NeuCodec(
     def decode_code(self, fsq_codes: torch.Tensor) -> torch.Tensor:
         """
         Args:
-            fsq_codes: torch.Tensor [B, 1, F], 50hz fsq codes
+            fsq_codes: torch.Tensor [B, 1, F], 50hz FSQ codes
 
         Returns:
             recon: torch.Tensor [B, 1, T], reconstructed 24kHz audio
@@ -178,7 +187,7 @@ class DistillNeuCodec(NeuCodec):
             + 768,  # semantic model
             2048,
         )
-        self.fc_prior_sq = nn.Linear(512, 768)
+        self.fc_sq_prior = nn.Linear(512, 768)
         self.fc_post_a = nn.Linear(2048, 1024)
         
     def encode_code(self, audio_or_path:  torch.Tensor | Path | str) -> torch.Tensor:
@@ -203,7 +212,7 @@ class DistillNeuCodec(NeuCodec):
         )
 
         # acoustic encoding
-        fsq_emb = self.fc_prior_sq(self.codec_encoder(y))
+        fsq_emb = self.fc_prior_sq(self.codec_encoder(y.to(self.device)))
         fsq_emb = fsq_emb.transpose(1, 2)
 
         # semantic encoding

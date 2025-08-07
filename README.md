@@ -6,13 +6,15 @@ NeuCodec is an FSQ-based audio codec for speech tokenization.
 
 ## Model Details
 
+<!-- Provide a longer summary of what this model is. -->
+
 NeuCodec is an ultra low bit-rate audio codec which takes advantage of the following advances;
 
 * It uses both audio (BigCodec encoder) and semantic (Wav2Vec2-BERT-large) information in the encoding process. 
-* The quantisation method is FSQ rather than RVQ, resulting in a single vector for the quantised output, which makes it ideal for downstream modeling in SpeechLMs.
-* At 50 tokens/sec and 16 bits per token, the bit-rate is 800 bits/sec.
+* We make use of Finite Scalar Quantisation (FSQ) resulting in a single vector for the quantised output, which makes it ideal for downstream modeling in SpeechLMs.
+* At 50 tokens/sec and 16 bits per token, the overall bit-rate is 0.8kbps.
 
-Our work is largely based on the work of [HKUSTAudio/xcodec2](https://huggingface.co/HKUSTAudio/xcodec2).
+Our work largely based on extending the work of [X-Codec2.0](https://huggingface.co/HKUSTAudio/xcodec2).
 
 - **Developed by:** Neuphonic
 - **Model type:** Neural Audio Codec
@@ -64,17 +66,7 @@ sf.write("reconstructed.wav", recon_wav[0, 0, :].numpy(), sr)
 
 ## Training Details
 
-### Training Data
-
-<!-- This should link to a Dataset Card, perhaps with a short stub of information on what the training data is all about as well as documentation related to data pre-processing or additional filtering. -->
-
-The model was trained on a mix of publicly available and proprietary data. The publicly available data includes the English segments of Emilia-YODAS, MLS, LibriTTS, Fleurs, CommonVoice, and HUI.
-
-### Training Procedure
-
-The model was trained for 800k steps on one 8xH100 node with an effective batch size of 64.
-
-<!-- This relates heavily to the Technical Specifications. Content here should link to that section when it is relevant to the training procedure. -->
+The model was trained on a mix of publicly available and proprietary data. The publicly available data includes the English segments of Emilia-YODAS, MLS, LibriTTS, Fleurs, CommonVoice, and HUI. All publically available data was covered by either the CC-BY-4.0 or CC0 license.
 
 ## Evaluation
 
@@ -109,4 +101,3 @@ As we are interested the the degree of distortion from the unencoded to reconstr
 **BibTeX:**
 
 Coming Soon
-
