@@ -23,7 +23,7 @@ Use the code below to get started with the model.
 To install from pypi in a dedicated environment:
 
 ```bash
-conda create -n neucodec python>3.9
+conda create -n neucodec python>3.10
 conda activate neucodec
 pip install neucodec
 ```
