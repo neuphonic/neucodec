@@ -133,7 +133,7 @@ class NeuCodec(
         # prepare inputs
         y = self._prepare_audio(audio_or_path)
         semantic_features = self.feature_extractor(
-            y, sampling_rate=16_000, return_tensors="pt"
+            y.squeeze(0), sampling_rate=16_000, return_tensors="pt"
         ).input_features.to(self.device)
 
         # acoustic encoding
