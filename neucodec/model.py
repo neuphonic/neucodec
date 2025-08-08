@@ -62,7 +62,7 @@ class NeuCodec(
         
         assert model_id in ["neuphonic/neucodec", "neuphonic/distill-neucodec"]
         if model_id == "neuphonic/neucodec": 
-            ignore_keys = ["fc_post_s", "post_net", "SemanticDecoder"]
+            ignore_keys = ["fc_post_s", "SemanticDecoder"]
         elif model_id == "neuphonic/distill-neucodec":
             ignore_keys = []
 
