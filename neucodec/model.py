@@ -61,7 +61,7 @@ class NeuCodec(
         
         assert model_id in ["neuphonic/neucodec", "neuphonic/distill-neucodec"]
         if model_id == "neuphonic/neucodec": 
-            ignore_keys = ["fc_post_s", "post_net", "SemanticDecoder"]
+            ignore_keys = ["fc_post_s", "SemanticDecoder"]
         elif model_id == "neuphonic/distill-neucodec":
             ignore_keys = []
 
@@ -114,7 +114,7 @@ class NeuCodec(
                 )
 
         # pad audio
-        pad_for_wav = 320 - (y.shape[1] % 320)
+        pad_for_wav = 320 - (y.shape[-1] % 320)
         y = torch.nn.functional.pad(y, (0, pad_for_wav))
         
         return y
@@ -131,7 +131,7 @@ class NeuCodec(
         # prepare inputs
         y = self._prepare_audio(audio_or_path)
         semantic_features = self.feature_extractor(
-            y, sampling_rate=16_000, return_tensors="pt"
+            y.squeeze(0), sampling_rate=16_000, return_tensors="pt"
         ).input_features.to(self.device)
 
         # acoustic encoding
