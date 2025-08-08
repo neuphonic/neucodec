@@ -35,7 +35,6 @@ class NeuCodec(
         self.SemanticEncoder_module = SemanticEncoder(1024, 1024, 1024)
         self.CodecEnc = CodecEncoder()
         self.generator = CodecDecoderVocos(hop_length=hop_length)
-        #self.generator.apply_weight_norm()
         self.fc_prior = nn.Linear(2048, 2048)
         self.fc_post_a = nn.Linear(2048, 1024)
 
@@ -92,7 +91,6 @@ class NeuCodec(
 
         # TODO: we can move to strict loading once we clean up the checkpoints
         model.load_state_dict(state_dict, strict=False)
-        #model.generator.remove_weight_norm()
 
         return model
     
