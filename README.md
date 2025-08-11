@@ -1,3 +1,5 @@
+HuggingFace: [Model](https://huggingface.co/neuphonic/neucodec), [Distilled Model](https://huggingface.co/neuphonic/distill-neucodec)
+
 # Model Details
 
 NeuCodec is a Finite Scalar Quantisation (FSQ) based 0.8kbps audio codec for speech tokenization.
