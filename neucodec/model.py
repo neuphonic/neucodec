@@ -78,6 +78,19 @@ class NeuCodec(
             token=token,
         )
 
+        # download meta.yaml to track number of downloads
+        _ = hf_hub_download(
+            repo_id=model_id,
+            filename="meta.yaml",
+            revision=revision,
+            cache_dir=cache_dir,
+            force_download=force_download,
+            proxies=proxies,
+            resume_download=resume_download,
+            local_files_only=local_files_only,
+            token=token,
+        )
+
         # initialize model
         model = cls(24_000, 480)
 
