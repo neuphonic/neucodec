@@ -13,7 +13,7 @@ A lightweight neural codec that encodes audio at just 0.8 kbps - perfect for res
 
 # Key Features
 
-🔊 Low bit-rate compression: a speech codec that compresses and reconstructs audio with near-inaudible reconstruction loss but at a low 0.8 kpbs bit-rate
+🔊 Low bit-rate compression - a speech codec that compresses and reconstructs audio with near-inaudible reconstruction loss
 <br>
 🎼 Upsamples from 16kHz → 24kHz
 <br>
@@ -21,7 +21,7 @@ A lightweight neural codec that encodes audio at just 0.8 kbps - perfect for res
 <br>
 🏢 Commercial use permitted - use it in your own tools or products
 <br>
-📊 Released with large pre-encoded datasets dataset - we’ve compressed the Emilia Yodas dataset from 1.7TB to 41GB using NeuCodec significantly reducing the compute requirements needed. 
+📊 Released with large pre-encoded datasets - we’ve compressed Emilia-YODAS from 1.7TB to 41GB using NeuCodec, significantly reducing the compute requirements needed for training 
 <br>
 
 # Model Details
