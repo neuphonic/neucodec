@@ -1,15 +1,28 @@
-# NeuCodec
+# NeuCodec 🎧
 
 HuggingFace 🤗: [Model](https://huggingface.co/neuphonic/neucodec), [Distilled Model](https://huggingface.co/neuphonic/distill-neucodec)
 
 
-<div align="center">
-
-[![NeuCodec Intro](http://img.youtube.com/vi/O7XH1lGZyYY/0.jpg)](https://www.youtube.com/watch?v=O7XH1lGZyYY)
+[![NeuCodec Intro](NeuCodec-Thumbnail.jpg)](https://www.youtube.com/watch?v=O7XH1lGZyYY)
 <br>
-*Introductory Video for NeuCodec*
+*Click the image above to see NeuCodec in action on Youtube!*
 
-</div>
+*Created by Neuphonic - building faster, smaller, on-device voice AI*
+
+A lightweight neural codec that encodes audio at just 0.8 kbps - perfect for researchers and builders who need something that *just works* for training high quality text-to-speech models.
+
+# Key Features
+
+🔊 Low bit-rate compression - a speech codec that compresses and reconstructs audio with near-inaudible reconstruction loss
+<br>
+🎼 Upsamples from 16kHz → 24kHz
+<br>
+🌍 Ready for real-world use - train your own SpeechLMs without needing to build your own codec
+<br>
+🏢 Commercial use permitted - use it in your own tools or products
+<br>
+📊 Released with large pre-encoded datasets - we’ve compressed Emilia-YODAS from 1.7TB to 41GB using NeuCodec, significantly reducing the compute requirements needed for training 
+<br>
 
 # Model Details
 
