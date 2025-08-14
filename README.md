@@ -17,6 +17,8 @@ Our work largely based on extending the work of [X-Codec2.0](https://huggingface
 - **License:** apache-2.0
 - **Repository:** https://github.com/neuphonic/neucodec
 - **Paper:** *Coming soon!*
+- **Pre-encoded Datasets**:
+  - [Emilia-YODAS-EN](https://huggingface.co/datasets/neuphonic/emilia-yodas-english-neucodec)
 
 ## Get Started
 
