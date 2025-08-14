@@ -1,4 +1,15 @@
-HuggingFace: [Model](https://huggingface.co/neuphonic/neucodec), [Distilled Model](https://huggingface.co/neuphonic/distill-neucodec)
+# NeuCodec
+
+HuggingFace 🤗: [Model](https://huggingface.co/neuphonic/neucodec), [Distilled Model](https://huggingface.co/neuphonic/distill-neucodec)
+
+
+<div align="center">
+
+[![NeuCodec Intro](http://img.youtube.com/vi/O7XH1lGZyYY/0.jpg)](https://www.youtube.com/watch?v=O7XH1lGZyYY)
+<br>
+*Introductory Video for NeuCodec*
+
+</div>
 
 # Model Details
 
