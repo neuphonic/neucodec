@@ -5,7 +5,7 @@ HuggingFace 🤗: [Model](https://huggingface.co/neuphonic/neucodec), [Distilled
 
 [![NeuCodec Intro](http://img.youtube.com/vi/O7XH1lGZyYY/0.jpg)](https://www.youtube.com/watch?v=O7XH1lGZyYY)
 <br>
-*Click the image above to see NeuCodec in Action on Youtube!*
+*Click the image above to see NeuCodec in action on Youtube!*
 
 *Created by Neuphonic - building faster, smaller, on-device voice AI*
 
@@ -13,7 +13,7 @@ A lightweight neural codec that encodes audio at just 0.8 kbps - perfect for res
 
 # Key Features
 
-🔊 0.8 kbps compression: a speech codec that compresses and reconstructs audio with near-inaudible reconstruction loss but at a low bitrate
+🔊 Low bit-rate compression: a speech codec that compresses and reconstructs audio with near-inaudible reconstruction loss but at a low 0.8 kpbs bit-rate
 <br>
 🎼 Upsamples from 16kHz → 24kHz
 <br>
