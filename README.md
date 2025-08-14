@@ -13,7 +13,7 @@ A lightweight neural codec that encodes audio at just 0.8 kbps - perfect for res
 
 # Key Features
 
-🔊 0.8 kbps compression: a speech codec that compresses and reconstructs audio with near-inaudible reconstruction loss but at a low 0.8kbps bitrate
+🔊 0.8 kbps compression: a speech codec that compresses and reconstructs audio with near-inaudible reconstruction loss but at a low bitrate
 <br>
 🎼 Upsamples from 16kHz → 24kHz
 <br>
