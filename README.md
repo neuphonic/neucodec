@@ -2,6 +2,8 @@ HuggingFace: [Model](https://huggingface.co/neuphonic/neucodec), [Distilled Mode
 
 
 [![NeuCodec Intro](http://img.youtube.com/vi/O7XH1lGZyYY/0.jpg)](https://www.youtube.com/watch?v=O7XH1lGZyYY")
+<br>
+*NeuCodec Intro*
 
 # Model Details
 
