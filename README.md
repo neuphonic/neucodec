@@ -1,3 +1,5 @@
+# NeuCodec
+
 HuggingFace: [Model](https://huggingface.co/neuphonic/neucodec), [Distilled Model](https://huggingface.co/neuphonic/distill-neucodec)
 
 
