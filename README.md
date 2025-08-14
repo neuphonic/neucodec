@@ -14,10 +14,15 @@ A lightweight neural codec that encodes audio at just 0.8 kbps - perfect for res
 # Key Features
 
 🔊 0.8 kbps compression: a speech codec that compresses and reconstructs audio with near-inaudible reconstruction loss but at a low 0.8kbps bitrate
+<br>
 🎼 Upsamples from 16kHz → 24kHz
+<br>
 🌍 Ready for real-world use - train your own SpeechLMs without needing to build your own codec
+<br>
 🏢 Commercial use permitted - use it in your own tools or products
+<br>
 📊 Released with large pre-encoded datasets dataset - we’ve compressed the Emilia Yodas dataset from 1.7TB to 41GB using NeuCodec significantly reducing the compute requirements needed. 
+<br>
 
 # Model Details
 
