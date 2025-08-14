@@ -7,7 +7,7 @@ HuggingFace 🤗: [Model](https://huggingface.co/neuphonic/neucodec), [Distilled
 
 [![NeuCodec Intro](http://img.youtube.com/vi/O7XH1lGZyYY/0.jpg)](https://www.youtube.com/watch?v=O7XH1lGZyYY)
 <br>
-*Click on the image above to see NeuCodec in action!*
+*Click on the image above to see NeuCodec in action on YouTube!*
 
 
 # Model Details
