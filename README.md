@@ -59,7 +59,7 @@ pip install neucodec
 
 **Using uv:**
 ```bash
-uv venv neucodec --python 3.9
+uv venv neucodec --python 3.10
 source neucodec/bin/activate  # On Windows: neucodec\Scripts\activate
 uv pip install neucodec
 ```
