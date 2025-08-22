@@ -50,10 +50,18 @@ Use the code below to get started with the model.
 
 To install from pypi in a dedicated environment:
 
+**Using conda + pip:**
 ```bash
 conda create -n neucodec python>3.9
 conda activate neucodec
 pip install neucodec
+```
+
+**Using uv:**
+```bash
+uv venv neucodec --python 3.10
+source neucodec/bin/activate  # On Windows: neucodec\Scripts\activate
+uv pip install neucodec
 ```
 Then, to use in python:
 
