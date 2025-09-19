@@ -1,13 +1,14 @@
-import os
 from typing import Optional, Dict
 from pathlib import Path
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchaudio
 from torchaudio import transforms as T
-from huggingface_hub import PyTorchModelHubMixin, hf_hub_download
+from huggingface_hub import PyTorchModelHubMixin, ModelHubMixin, hf_hub_download
 from transformers import AutoFeatureExtractor, HubertModel, Wav2Vec2BertModel
+import onnxruntime
 
 from .codec_encoder import CodecEncoder
 from .codec_encoder_distill import DistillCodecEncoder
@@ -247,3 +248,93 @@ class DistillNeuCodec(NeuCodec):
         concat_emb = self.fc_prior(concat_emb.transpose(1, 2)).transpose(1, 2)
         _, fsq_codes, _ = self.generator(concat_emb, vq=True)
         return fsq_codes
+
+
+class NeuCodecOnnxDecoder(
+    ModelHubMixin,
+    repo_url="https://github.com/neuphonic/neucodec",
+    license="apache-2.0",
+):
+    
+    def __init__(self, onnx_path):
+        so = onnxruntime.SessionOptions()
+        so.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_ENABLE_AL
+        self.session = onnxruntime.InferenceSession(
+            onnx_path,
+            sess_options=so
+        )
+
+    @classmethod
+    def _from_pretrained(
+        cls,
+        *,
+        model_id: str,
+        revision: Optional[str] = None,
+        cache_dir: Optional[str] = None,
+        force_download: bool = False,
+        proxies: Optional[Dict] = None,
+        resume_download: bool = False,
+        local_files_only: bool = False,
+        token: Optional[str] = None,
+        map_location: str = "cpu",
+        strict: bool = True,
+        **model_kwargs,
+    ):
+        
+        # download the model weights file
+        onnx_path = hf_hub_download(
+            repo_id=model_id,
+            filename="model.onnx",
+            revision=revision,
+            cache_dir=cache_dir,
+            force_download=force_download,
+            proxies=proxies,
+            resume_download=resume_download,
+            local_files_only=local_files_only,
+            token=token,
+        )
+
+        # download meta.yaml to track number of downloads
+        _ = hf_hub_download(
+            repo_id=model_id,
+            filename="meta.yaml",
+            revision=revision,
+            cache_dir=cache_dir,
+            force_download=force_download,
+            proxies=proxies,
+            resume_download=resume_download,
+            local_files_only=local_files_only,
+            token=token,
+        )
+
+        # initialize model
+        model = cls(onnx_path)
+
+        return model
+    
+    def encode_code(self, *args, **kwargs):
+        raise NotImplementedError(
+            "The onnx decoder has no functionality to encode codes, as it only contains the compiled decoder graph."
+        )
+    
+    def decode_code(self, codes: np.array) -> np.array:
+        """
+        Args:
+            fsq_codes: np.array [B, 1, F], 50hz FSQ codes
+
+        Returns:
+            recon: np.array [B, 1, T], reconstructed 24kHz audio
+        """
+
+        # validate inputs
+        if not isinstance(codes, np.array):
+            raise ValueError("`Codes` should be an np.array.")
+        if not len(codes.shape) == 3:
+            raise ValueError("`Codes` should be of shape [B, 1, F].")
+
+        # run decoder
+        recon = self.session.run(
+            None, {"codes": codes}
+        )[0].astype(np.float32)
+        
+        return recon
