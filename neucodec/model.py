@@ -349,4 +349,4 @@ class NeuCodecOnnxDecoder(
             None, {"codes": codes}
         )[0].astype(np.float32)
         
-        return recon #[:, :, 240:-240] # take off 1x hop length of padding
+        return recon
