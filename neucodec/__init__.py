@@ -1,1 +1,1 @@
-from .model import NeuCodec, DistillNeuCodec
+from .model import NeuCodec, DistillNeuCodec, NeuCodecOnnxDecoder

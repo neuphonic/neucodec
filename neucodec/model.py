@@ -8,7 +8,6 @@ import torchaudio
 from torchaudio import transforms as T
 from huggingface_hub import PyTorchModelHubMixin, ModelHubMixin, hf_hub_download
 from transformers import AutoFeatureExtractor, HubertModel, Wav2Vec2BertModel
-import onnxruntime
 
 from .codec_encoder import CodecEncoder
 from .codec_encoder_distill import DistillCodecEncoder
@@ -257,12 +256,21 @@ class NeuCodecOnnxDecoder(
 ):
     
     def __init__(self, onnx_path):
+        
+        # onnx import
+        try: 
+            import onnxruntime
+        except ImportError as e:
+            raise ImportError("Failed to import `onnxruntime`. Install with the following command: pip install onnxruntime") from e
+        
+        # load model
         so = onnxruntime.SessionOptions()
-        so.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_ENABLE_AL
+        so.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
         self.session = onnxruntime.InferenceSession(
             onnx_path,
             sess_options=so
         )
+        self.sample_rate = 24_000
 
     @classmethod
     def _from_pretrained(
@@ -308,7 +316,11 @@ class NeuCodecOnnxDecoder(
         )
 
         # initialize model
-        model = cls(onnx_path)
+        model = cls(onnx_path) #cls(onnx_path)
+
+        # only support CPU
+        if map_location != "cpu":
+            raise ValueError("The onnx decoder currently only supports CPU runtimes.")
 
         return model
     
@@ -317,7 +329,7 @@ class NeuCodecOnnxDecoder(
             "The onnx decoder has no functionality to encode codes, as it only contains the compiled decoder graph."
         )
     
-    def decode_code(self, codes: np.array) -> np.array:
+    def decode_code(self, codes: np.ndarray) -> np.ndarray:
         """
         Args:
             fsq_codes: np.array [B, 1, F], 50hz FSQ codes
@@ -327,9 +339,9 @@ class NeuCodecOnnxDecoder(
         """
 
         # validate inputs
-        if not isinstance(codes, np.array):
+        if not isinstance(codes, np.ndarray):
             raise ValueError("`Codes` should be an np.array.")
-        if not len(codes.shape) == 3:
+        if not len(codes.shape) == 3 or codes.shape[1] != 1:
             raise ValueError("`Codes` should be of shape [B, 1, F].")
 
         # run decoder
@@ -337,4 +349,4 @@ class NeuCodecOnnxDecoder(
             None, {"codes": codes}
         )[0].astype(np.float32)
         
-        return recon
+        return recon #[:, :, 240:-240] # take off 1x hop length of padding

@@ -63,7 +63,12 @@ uv venv neucodec --python 3.10
 source neucodec/bin/activate  # On Windows: neucodec\Scripts\activate
 uv pip install neucodec
 ```
-Then, to use in python:
+
+If you would like to use the onnx decoder, also install `onnxruntime`:
+```bash
+pip install onnxruntime
+```
+Then, to use the regular codec in python:
 
 ```python
 import librosa
