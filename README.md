@@ -3,9 +3,7 @@
 HuggingFace 🤗: [Model](https://huggingface.co/neuphonic/neucodec), [Distilled Model](https://huggingface.co/neuphonic/distill-neucodec)
 
 
-[![NeuCodec Intro](NeuCodec-Thumbnail.jpg)](https://www.youtube.com/watch?v=O7XH1lGZyYY)
-<br>
-*Click the image above to see NeuCodec in action on Youtube!*
+[NeuCodec Demo](https://github.com/user-attachments/assets/c03745cd-a8c8-46ca-8f5d-ba3af091923f)
 
 *Created by Neuphonic - building faster, smaller, on-device voice AI*
 
@@ -40,7 +38,7 @@ Our work largely based on extending the work of [X-Codec2.0](https://huggingface
 - **Model type:** Neural Audio Codec
 - **License:** apache-2.0
 - **Repository:** https://github.com/neuphonic/neucodec
-- **Paper:** *Coming soon!*
+- **Paper:** [arXiv](https://arxiv.org/abs/2509.09550)
 - **Pre-encoded Datasets**:
   - [Emilia-YODAS-EN](https://huggingface.co/datasets/neuphonic/emilia-yodas-english-neucodec)
 
@@ -105,3 +103,17 @@ The model was trained using the following data:
 * Additional proprietary set
 
 All publically available data was covered by either the CC-BY-4.0 or CC0 license.
+
+## Citation
+
+To cite this project, use the following bibtex entry:
+
+```
+@article{julian2025fsq,
+  title={Finite Scalar Quantization Enables Redundant and Transmission-Robust Neural Audio Compression at Low Bit-rates},
+  author={Julian, Harry and Beeson, Rachel and Konathala, Lohith and Ulin, Johanna and Gao, Jiameng},
+  journal={arXiv preprint arXiv:2509.09550},
+  year={2025},
+  url={https://arxiv.org/abs/2509.09550}
+}
+```
