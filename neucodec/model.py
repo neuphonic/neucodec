@@ -338,6 +338,9 @@ class NeuCodecOnnxDecoder(
             recon: np.array [B, 1, T], reconstructed 24kHz audio
         """
 
+        if isinstance(codes, torch.Tensor):
+            codes = codes.detach().cpu().numpy()
+
         # validate inputs
         if not isinstance(codes, np.ndarray):
             raise ValueError("`Codes` should be an np.array.")
