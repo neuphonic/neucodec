@@ -22,13 +22,16 @@ class NeuCodec(
     license="apache-2.0",
 ):
 
-    def __init__(self, sample_rate: int, hop_length: int):
+    def __init__(self, sample_rate: int, hop_length: int, optimize_semantic_model: bool = True):
         super().__init__()
         self.sample_rate = sample_rate
         self.hop_length = hop_length
         self.semantic_model = Wav2Vec2BertModel.from_pretrained(
             "facebook/w2v-bert-2.0", output_hidden_states=True
         )
+        # (harryjulian): remove layers after #16 as these are the features we use
+        if optimize_semantic_model:
+            self.semantic_model.encoder.layers[:16]
         self.feature_extractor = AutoFeatureExtractor.from_pretrained(
             "facebook/w2v-bert-2.0"
         )
@@ -55,14 +58,17 @@ class NeuCodec(
         local_files_only: bool = False,
         token: Optional[str] = None,
         map_location: str = "cpu",
+        optimize_semantic_model: bool = True,
         strict: bool = True,
         **model_kwargs,
     ):
         
         assert model_id in ["neuphonic/neucodec", "neuphonic/distill-neucodec"]
+        distilled = False
         if model_id == "neuphonic/neucodec": 
             ignore_keys = ["fc_post_s", "SemanticDecoder"]
         elif model_id == "neuphonic/distill-neucodec":
+            distilled = True
             ignore_keys = []
 
         # download the model weights file
@@ -92,7 +98,10 @@ class NeuCodec(
         )
 
         # initialize model
-        model = cls(24_000, 480)
+        if not distilled:
+            model = cls(24_000, 480, optimize_semantic_model)
+        else:
+            model = cls(24_000, 480)
 
         # load weights
         state_dict = torch.load(ckpt_path, map_location)

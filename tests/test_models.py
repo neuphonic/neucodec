@@ -23,12 +23,17 @@ def example_fpath():
 
 @pytest.fixture
 def neucodec_fixture():
-    return NeuCodec.from_pretrained("neuphonic/neucodec")
+    return NeuCodec.from_pretrained("neuphonic/neucodec", optimize_semantic_model=False).eval()
+
+
+@pytest.fixture
+def neucodec_optimized_semantic_fixture():
+    return NeuCodec.from_pretrained("neuphonic/neucodec", optimize_semantic_model=True).eval()
 
 
 @pytest.fixture
 def distill_neucodec_fixture():
-    return DistillNeuCodec.from_pretrained("neuphonic/distill-neucodec")
+    return DistillNeuCodec.from_pretrained("neuphonic/distill-neucodec").eval()
 
 
 @pytest.fixture
@@ -92,3 +97,11 @@ def test_onnx_decoder(neucodec_fixture, onnx_decoder_fixture, example_fpath):
     assert F.mse_loss(recon[..., :min_len], torch.tensor(recon_onnx[..., :min_len])) < 0.03 # check torch and onnx recons don't deviate
     min_len = min(y_true.shape[-1], recon_onnx_16.shape[-1])
     assert F.mse_loss(y_true[..., :min_len], recon_onnx_16[..., :min_len]) < 0.03 # check deviation from sample 
+
+
+@torch.inference_mode()
+def test_semantic_model_optimization(neucodec_fixture, neucodec_optimized_semantic_fixture, example_fpath):
+    fpath, _, _ = example_fpath
+    neucodec_result = neucodec_fixture.encode_code(fpath)
+    neucodec_semantic_opt_result = neucodec_optimized_semantic_fixture.encode_code(fpath)
+    assert torch.allclose(neucodec_result, neucodec_semantic_opt_result)
