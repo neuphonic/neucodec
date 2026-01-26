@@ -6,7 +6,6 @@ from torchaudio import transforms as T
 import librosa
 from ..neucodec import NeuCodec, DistillNeuCodec, NeuCodecOnnxDecoder
 
-
 @pytest.fixture
 def example_audio():
     y, sr = torchaudio.load(librosa.ex("libri1"))
@@ -100,7 +99,7 @@ def test_neucodec_batched_autoencode(neucodec_fixture, example_audio):
     y_batched = torch.vstack([y for _ in range(2)])
     vq_codes = neucodec_fixture.encode_code(y_batched)
     recon = neucodec_fixture.decode_code(vq_codes)
-    assert torch.allclose(recon[0, :, :], torch.allclose(recon[1, :, :]))
+    assert torch.allclose(recon[0, :, :], recon[1, :, :], atol=1e-4, rtol=1e-4)
 
 
 @torch.inference_mode()
@@ -109,4 +108,4 @@ def test_distill_neucodec_batched_autoencode(distill_neucodec_fixture, example_a
     y_batched = torch.vstack([y for _ in range(2)])
     vq_codes = distill_neucodec_fixture.encode_code(y_batched)
     recon = distill_neucodec_fixture.decode_code(vq_codes)
-    assert torch.allclose(recon[0, :, :], torch.allclose(recon[1, :, :]))
+    assert torch.allclose(recon[0, :, :], recon[1, :, :], atol=1e-4, rtol=1e-4)
