@@ -148,7 +148,7 @@ class NeuCodec(
             for i in range(y.size(0)):
                 semantic_features = (
                     self.feature_extractor(
-                        F.pad(y[i, :].cpu(), (160, 160)),
+                        y[i, :].cpu(),
                         sampling_rate=16_000,
                         return_tensors="pt",
                     )
@@ -159,7 +159,7 @@ class NeuCodec(
         else:
             semantic_features = (
                 self.feature_extractor(
-                    F.pad(y[0, :].cpu(), (160, 160)),
+                    y[0, :].cpu(),
                     sampling_rate=16_000,
                     return_tensors="pt",
                 )
