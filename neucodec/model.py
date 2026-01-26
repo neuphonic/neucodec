@@ -29,6 +29,7 @@ class NeuCodec(
         self.semantic_model = Wav2Vec2BertModel.from_pretrained(
             "facebook/w2v-bert-2.0", output_hidden_states=True
         )
+        
         # (harryjulian): remove layers after #16 as these are the features we use
         if optimize_semantic_model:
             self.semantic_model.encoder.layers[:16]
@@ -58,7 +59,7 @@ class NeuCodec(
         local_files_only: bool = False,
         token: Optional[str] = None,
         map_location: str = "cpu",
-        optimize_semantic_model: bool = True,
+        optimize_semantic_model: bool = False,
         strict: bool = True,
         **model_kwargs,
     ):
