@@ -22,7 +22,7 @@ class NeuCodec(
     license="apache-2.0",
 ):
 
-    def __init__(self, sample_rate: int, hop_length: int, optimize_semantic_model: bool = True):
+    def __init__(self, sample_rate: int, hop_length: int):
         super().__init__()
         self.sample_rate = sample_rate
         self.hop_length = hop_length
@@ -30,9 +30,8 @@ class NeuCodec(
             "facebook/w2v-bert-2.0", output_hidden_states=True
         )
         
-        # (harryjulian): remove layers after #16 as these are the features we use
-        if optimize_semantic_model:
-            self.semantic_model.encoder.layers[:16]
+        # (harryjulian): remove layers after #16 as we don't need the features after that
+        self.semantic_model.encoder.layers[:16]
         self.feature_extractor = AutoFeatureExtractor.from_pretrained(
             "facebook/w2v-bert-2.0"
         )
@@ -59,7 +58,6 @@ class NeuCodec(
         local_files_only: bool = False,
         token: Optional[str] = None,
         map_location: str = "cpu",
-        optimize_semantic_model: bool = False,
         strict: bool = True,
         **model_kwargs,
     ):
@@ -99,10 +97,7 @@ class NeuCodec(
         )
 
         # initialize model
-        if not distilled:
-            model = cls(24_000, 480, optimize_semantic_model)
-        else:
-            model = cls(24_000, 480)
+        model = cls(24_000, 480)
 
         # load weights
         state_dict = torch.load(ckpt_path, map_location)
