@@ -88,8 +88,7 @@ class ISTFT(nn.Module):
         ).squeeze()[pad:-pad]
 
         # Normalize
-        assert (window_envelope > 1e-11).all()
-        y = y / window_envelope
+        y = y / window_envelope.clamp(min=1e-11)
 
         return y
 
