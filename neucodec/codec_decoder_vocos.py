@@ -86,9 +86,8 @@ class ISTFT(nn.Module):
             kernel_size=(1, self.win_length),
             stride=(1, self.hop_length),
         ).squeeze()[pad:-pad]
-
-        # Normalize
-        y = y / window_envelope.clamp(min=1e-11)
+        
+        y = y / window_envelope
 
         return y
 
