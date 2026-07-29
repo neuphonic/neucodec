@@ -91,6 +91,35 @@ with torch.no_grad():
 torchaudio.save("reconstructed.wav", recon[0, :, :], 24_000)
 ```
 
+Onnx Inference,
+
+```py
+import librosa
+import torch
+import soundfile as sf
+import torchaudio
+from torchaudio import transforms as T
+from neucodec import NeuCodec, NeuCodecOnnxDecoder
+ 
+model = NeuCodec.from_pretrained("neuphonic/neucodec")
+model.eval()
+compiled_model = NeuCodecOnnxDecoder.from_pretrained("neuphonic/neucodec-onnx-decoder")
+#input audio path
+input_path = "conversation_19143_segment_2.wav"
+ 
+y, sr = torchaudio.load(input_path)
+if sr != 16_000:
+    y = T.Resample(sr, 16_000)(y)[None, ...] # (B, 1, T_16)
+
+with torch.no_grad():
+    fsq_codes = model.encode_code(y)
+    print(f"Codes shape: {fsq_codes.shape}")
+    recon = compiled_model.decode_code(fsq_codes) # (B, 1, T_24)
+    recon_squeezed = recon.squeeze()  # This will give shape (74400,)
+
+sf.write("reconstructed_onnx.wav", recon_squeezed, 24_000)
+```
+
 ## Training Details
 
 The model was trained using the following data: 
